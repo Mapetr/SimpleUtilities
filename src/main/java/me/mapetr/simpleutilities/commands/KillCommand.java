@@ -14,7 +14,7 @@ import java.awt.print.Paper;
 public class KillCommand extends BaseCommand {
     @Default
     @Description("Kills you")
-    public static void onCommand(Player player) {
+    public void onCommand(Player player) {
         player.setHealth(0);
     }
 }
