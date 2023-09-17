@@ -1,0 +1,4 @@
+name: SimpleUtilities
+version: '${project.version}'
+main: me.mapetr.simpleutilities.Main
+api-version: '1.20'
