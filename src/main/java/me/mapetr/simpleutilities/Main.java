@@ -51,6 +51,8 @@ public final class Main extends JavaPlugin implements Listener {
         config.addDefault("header", "I love head <tps>");
         config.addDefault("delay", 100);
         config.addDefault("frequency", 200);
+        config.addDefault("chat.format", "<player>: <msg>");
+        config.addDefault("chat.name.color", "#FF7F00");
         Bukkit.getScheduler().runTaskTimerAsynchronously(this,() -> {
             _playerListManager.reloadGlobalPlayerList(msg);
         },config.getLong("delay"),config.getLong("frequency"));

@@ -4,8 +4,10 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.util.RGBLike;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -24,9 +26,10 @@ public class ChatService {
         try {
             Component parsed = msg.deserialize(
                     "<player>: <msg>",
-                    Placeholder.component("player", Component.text(event.getPlayer().getName(), NamedTextColor.LIGHT_PURPLE)),
-                    Placeholder.component("msg", Component.text(event.getMessage(), NamedTextColor.AQUA))
+                    Placeholder.component("player", Component.text(event.getPlayer().getName(), TextColor.fromCSSHexString("#FF7F00"))),
+                    Placeholder.component("msg", Component.text(event.getMessage()))
             );
+
             Bukkit.getServer().sendMessage(parsed);
             return true;
         } catch (Exception ex) {
