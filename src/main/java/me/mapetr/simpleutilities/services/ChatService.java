@@ -25,9 +25,9 @@ public class ChatService {
     public boolean processMessage(AsyncPlayerChatEvent event, MiniMessage msg) {
         try {
             Component parsed = msg.deserialize(
-                    "<player>: <msg>",
-                    Placeholder.component("player", Component.text(event.getPlayer().getName(), TextColor.fromCSSHexString("#FF7F00"))),
-                    Placeholder.component("msg", Component.text(event.getMessage()))
+                    config.getString("chat.format"),
+                    Placeholder.component("player", Component.text(event.getPlayer().getName(), TextColor.fromCSSHexString(config.getString("chat.colors.name")))),
+                    Placeholder.component("msg", Component.text(event.getMessage(), TextColor.fromCSSHexString(config.getString("chat.colors.msg"))))
             );
 
             Bukkit.getServer().sendMessage(parsed);
