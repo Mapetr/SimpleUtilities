@@ -1,6 +1,7 @@
 package me.mapetr.simpleutilities.services;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -10,6 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChatService {
     private FileConfiguration config;
@@ -29,10 +33,12 @@ public class ChatService {
     public boolean processMessage(AsyncPlayerChatEvent event, MiniMessage msg) {
         try {
             String msgContent = event.getMessage();
+            Set<String> foundPlayers = new HashSet<String>();
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 String completeString = "@"+player.getName();
                 if (msgContent.contains(completeString)) {
-                    msgContent = msgContent.replaceAll(completeString, "!"+completeString);
+                    foundPlayers.add(completeString);
+                    msgContent = msgContent.replaceAll(completeString, completeString);
                     player.showTitle(title);
                 }
             }
@@ -41,6 +47,12 @@ public class ChatService {
                     Placeholder.component("player", Component.text(event.getPlayer().getName(), TextColor.fromCSSHexString(config.getString("chat.colors.name")))),
                     Placeholder.component("msg", Component.text(msgContent, TextColor.fromCSSHexString(config.getString("chat.colors.msg"))))
             );
+            if (foundPlayers.size() != 0) {
+                for (String s : foundPlayers) {
+                    TextReplacementConfig conf = TextReplacementConfig.builder().match(s).replacement(Component.text(s, TextColor.fromCSSHexString("#FF7F00"))).build();
+                    parsed = parsed.replaceText(conf);
+                }
+            }
 
             Bukkit.getServer().sendMessage(parsed);
             return true;
