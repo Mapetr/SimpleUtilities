@@ -1,5 +1,7 @@
 package me.mapetr.simpleutilities.services;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,6 +26,8 @@ public class ChatService {
     final Component mainTitle = Component.text("Zmínka", NamedTextColor.WHITE);
     final Component subtitle = Component.text("Byl jsi zmíněn v chatu :3", NamedTextColor.GRAY);
     final Title title = Title.title(mainTitle, subtitle);
+    Sound pingSound = Sound.sound(Key.key("ambient.cave"), Sound.Source.AMBIENT, 1f, 1f);
+
 
 
     //Should return success
@@ -40,6 +44,7 @@ public class ChatService {
                     foundPlayers.add(completeString);
                     msgContent = msgContent.replaceAll(completeString, completeString);
                     player.showTitle(title);
+                    player.playSound(pingSound);
                 }
             }
             Component parsed = msg.deserialize(
