@@ -9,12 +9,14 @@ import me.mapetr.simpleutilities.commands.KillCommand;
 import me.mapetr.simpleutilities.commands.SpectatorCommand;
 import me.mapetr.simpleutilities.commands.TeleportCommand;
 import me.mapetr.simpleutilities.commands.WarpCommand;
+import me.mapetr.simpleutilities.services.ChatService;
 import me.mapetr.simpleutilities.services.PlayerListManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,6 +25,7 @@ import java.sql.SQLException;
 public final class Main extends JavaPlugin implements Listener {
     FileConfiguration config = this.getConfig();
     PlayerListManager _playerListManager = new PlayerListManager(config);
+    ChatService _chatService = new ChatService(config);
     @Override
     public void onEnable() {
         DatabaseOptions options = DatabaseOptions.builder().sqlite("simpleutilities.db").build();
@@ -62,5 +65,8 @@ public final class Main extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         _playerListManager.reloadPlayerList(MiniMessage.miniMessage(), event.getPlayer());
     }
-
+    @EventHandler
+    public void onMessageSent(AsyncPlayerChatEvent event) {
+        event.setCancelled(_chatService.processMessage(event, MiniMessage.miniMessage()));
+    }
 }
