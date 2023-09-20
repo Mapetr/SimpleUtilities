@@ -4,9 +4,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerListManager {
 
@@ -21,13 +23,14 @@ public class PlayerListManager {
         };
     }
     public void reloadPlayerList(MiniMessage msg, Player player){
+        TagResolver.Single _tps = Placeholder.component("tps", Component.text(Math.round(Bukkit.getServer().getTPS()[0]), NamedTextColor.LIGHT_PURPLE));
         Component footer = msg.deserialize(
                 config.getString("footer"),
-                Placeholder.component("tps", Component.text(Math.round(Bukkit.getServer().getTPS()[0]), NamedTextColor.LIGHT_PURPLE))
+                _tps
         );
         Component header = msg.deserialize(
                 config.getString("header"),
-                Placeholder.component("tps", Component.text(Math.round(Bukkit.getServer().getTPS()[0]), NamedTextColor.LIGHT_PURPLE))
+                _tps
         );
         player.sendPlayerListFooter(footer);
         player.sendPlayerListHeader(header);
