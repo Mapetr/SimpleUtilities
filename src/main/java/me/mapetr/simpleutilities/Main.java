@@ -22,11 +22,9 @@ import java.sql.SQLException;
 
 public final class Main extends JavaPlugin implements Listener {
     FileConfiguration config = this.getConfig();
-    PlayerListManager _playerListManager;
+    PlayerListManager _playerListManager = new PlayerListManager(config);
     @Override
     public void onEnable() {
-        _playerListManager = new PlayerListManager(config);
-
         DatabaseOptions options = DatabaseOptions.builder().sqlite("simpleutilities.db").build();
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
