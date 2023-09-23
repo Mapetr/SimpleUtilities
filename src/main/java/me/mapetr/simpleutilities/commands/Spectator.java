@@ -7,7 +7,7 @@ import co.aikar.commands.annotation.Description;
 import org.bukkit.entity.Player;
 
 @CommandAlias("c")
-public class SpectatorCommand extends BaseCommand {
+public class Spectator extends BaseCommand {
     @Default
     @Description("Change gamemode to spectator")
     public void onCommand(Player player) {

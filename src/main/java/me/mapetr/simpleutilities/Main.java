@@ -1,14 +1,14 @@
 package me.mapetr.simpleutilities;
 
+import co.aikar.commands.BukkitCommandCompletionContext;
+import co.aikar.commands.CommandCompletions;
 import co.aikar.commands.PaperCommandManager;
-import co.aikar.idb.DB;
-import co.aikar.idb.Database;
-import co.aikar.idb.DatabaseOptions;
-import co.aikar.idb.PooledDatabaseOptions;
-import me.mapetr.simpleutilities.commands.KillCommand;
-import me.mapetr.simpleutilities.commands.SpectatorCommand;
-import me.mapetr.simpleutilities.commands.TeleportCommand;
-import me.mapetr.simpleutilities.commands.WarpCommand;
+import co.aikar.idb.*;
+import me.mapetr.simpleutilities.commands.*;
+import me.mapetr.simpleutilities.commands.teleport.Teleport;
+import me.mapetr.simpleutilities.commands.teleport.TeleportHere;
+import me.mapetr.simpleutilities.commands.warp.Warp;
+import me.mapetr.simpleutilities.commands.warp.WarpSet;
 import me.mapetr.simpleutilities.services.ChatService;
 import me.mapetr.simpleutilities.services.PlayerListManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -28,7 +28,7 @@ public final class Main extends JavaPlugin implements Listener {
     ChatService _chatService = new ChatService(config);
     @Override
     public void onEnable() {
-        DatabaseOptions options = DatabaseOptions.builder().sqlite("simpleutilities.db").build();
+        DatabaseOptions options = DatabaseOptions.builder().sqlite("plugins/simpleutilities/simpleutilities.db").build();
         Database db = PooledDatabaseOptions.builder().options(options).createHikariDatabase();
         DB.setGlobalDatabase(db);
 
@@ -39,11 +39,23 @@ public final class Main extends JavaPlugin implements Listener {
         }
 
         PaperCommandManager manager = new PaperCommandManager(this);
-        manager.registerCommand(new SpectatorCommand());
-        manager.registerCommand(new KillCommand());
-        manager.registerCommand(new TeleportCommand());
-        manager.registerCommand(new WarpCommand());
+        manager.registerCommand(new Spectator());
+        manager.registerCommand(new Kill());
+        manager.registerCommand(new Teleport());
+        manager.registerCommand(new TeleportHere());
+        manager.registerCommand(new Warp());
+        manager.registerCommand(new WarpSet());
         manager.enableUnstableAPI("help");
+
+        CommandCompletions<BukkitCommandCompletionContext> completions = manager.getCommandCompletions();
+        completions.registerAsyncCompletion("warps", c -> {
+            try {
+                return DB.getFirstColumnResults("SELECT name FROM warps");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         this.saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new Main(), this);
         MiniMessage msg = MiniMessage.miniMessage();
@@ -63,7 +75,9 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        DB.close();
     }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         _playerListManager.reloadPlayerList(MiniMessage.miniMessage(), event.getPlayer());

@@ -1,18 +1,16 @@
-package me.mapetr.simpleutilities.commands;
+package me.mapetr.simpleutilities.commands.teleport;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandCompletion;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import org.bukkit.entity.Player;
 
-@CommandAlias("tp")
-public class TeleportCommand extends BaseCommand {
+@CommandAlias("tphere")
+public class TeleportHere extends BaseCommand {
     @Default
+    @Syntax("<player>")
     @CommandCompletion("@players")
-    @Description("Teleports you to a player")
+    @Description("Teleports a player to you")
     public void onCommand(Player player, OnlinePlayer target) {
         if (target.player == null) {
             player.sendMessage("Player not found");
@@ -22,6 +20,6 @@ public class TeleportCommand extends BaseCommand {
             player.sendMessage("You can't teleport to yourself");
             return;
         }
-        player.teleport(target.player);
+        target.player.teleport(player);
     }
 }

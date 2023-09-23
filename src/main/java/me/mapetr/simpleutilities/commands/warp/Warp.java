@@ -1,4 +1,4 @@
-package me.mapetr.simpleutilities.commands;
+package me.mapetr.simpleutilities.commands.warp;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
@@ -11,9 +11,10 @@ import org.bukkit.entity.Player;
 import java.sql.SQLException;
 
 @CommandAlias("warp")
-public class WarpCommand extends BaseCommand {
+public class Warp extends BaseCommand {
     @Default
     @Syntax("<warp>")
+    @CommandCompletion("@warps")
     @Description("Teleports you to a warp")
     public void onCommand(Player player, String warp) {
         try {
@@ -30,31 +31,6 @@ public class WarpCommand extends BaseCommand {
                     row.getFloat("pitch"));
             player.sendMessage("Teleporting to warp " + warp);
             player.teleport(loc);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Subcommand("set")
-    @Syntax("<warp>")
-    @Description("Sets a warp")
-    public void onSet(Player player, String warp) {
-        try {
-            DbRow row = DB.getFirstRow("SELECT * FROM warps WHERE name = ?", warp);
-            if (row != null) {
-                player.sendMessage("Warp " + warp + " already exists");
-                return;
-            }
-            Location loc = player.getLocation();
-            DB.executeInsert("INSERT INTO warps (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    warp,
-                    loc.getWorld().getName(),
-                    loc.getX(),
-                    loc.getY(),
-                    loc.getZ(),
-                    loc.getYaw(),
-                    loc.getPitch());
-            player.sendMessage("Warp " + warp + " set");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
