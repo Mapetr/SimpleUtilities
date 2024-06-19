@@ -16,7 +16,6 @@ import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
@@ -28,7 +27,9 @@ class Main : JavaPlugin(), Listener {
     var _playerListManager: PlayerListManager = PlayerListManager(config)
     var _chatService: ChatService = ChatService(config)
     override fun onEnable() {
-        val options = DatabaseOptions.builder().sqlite("plugins/simpleutilities/simpleutilities.db").build()
+        saveDefaultConfig()
+
+        val options = DatabaseOptions.builder().sqlite("${this.dataFolder}/uwu.db").build()
         val db: Database = PooledDatabaseOptions.builder().options(options).createHikariDatabase()
         DB.setGlobalDatabase(db)
 
