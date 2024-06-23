@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/me.mapetr.uwuEssentials.main.iml" filepath="$PROJECT_DIR$/.idea/modules/me.mapetr.uwuEssentials.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/me.mapetr.uwuEssentials.test.iml" filepath="$PROJECT_DIR$/.idea/modules/me.mapetr.uwuEssentials.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/uwuEssentials.main.iml" filepath="$PROJECT_DIR$/.idea/modules/uwuEssentials.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/uwuEssentials.test.iml" filepath="$PROJECT_DIR$/.idea/modules/uwuEssentials.test.iml" />
     </modules>

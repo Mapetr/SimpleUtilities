@@ -6,6 +6,7 @@ import co.aikar.idb.DB
 import co.aikar.idb.Database
 import co.aikar.idb.DatabaseOptions
 import co.aikar.idb.PooledDatabaseOptions
+import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
@@ -18,6 +19,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -38,6 +40,11 @@ class Main : JavaPlugin(), Listener {
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
+        try {
+            DB.executeUpdate("CREATE TABLE IF NOT EXISTS back (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
 
         val manager = PaperCommandManager(this)
         manager.registerCommand(Spectator())
@@ -46,6 +53,7 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(TeleportHere())
         manager.registerCommand(Warp())
         manager.registerCommand(WarpSet())
+        manager.registerCommand(Back())
         manager.enableUnstableAPI("help")
 
         val completions = manager.commandCompletions
@@ -86,5 +94,14 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onMessageSent(event: AsyncPlayerChatEvent) {
         event.isCancelled = _chatService.processMessage(event, MiniMessage.miniMessage())
+    }
+
+    @EventHandler
+    fun onPlayerDeath(event: PlayerDeathEvent){
+        try {
+            DB.executeUpdate("INSERT OR REPLACE INTO back (name, x, y, z, yaw, pitch, world) VALUES (?, ?, ?, ?, ?, ?, ?)", event.player.uniqueId.toString(), event.entity.location.x, event.entity.location.y, event.entity.location.z, event.entity.location.yaw, event.entity.location.pitch, event.entity.location.world.name)
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
     }
 }

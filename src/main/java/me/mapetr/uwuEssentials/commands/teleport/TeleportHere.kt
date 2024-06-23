@@ -3,6 +3,7 @@ package me.mapetr.uwuEssentials.commands.teleport
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
+import co.aikar.idb.DB
 import org.bukkit.entity.Player
 
 @CommandAlias("tphere")
@@ -20,6 +21,18 @@ class TeleportHere : BaseCommand() {
             player.sendMessage("You can't teleport to yourself")
             return
         }
-        target.player.teleport(player)
+
+        DB.executeUpdate(
+            "INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            target.player.uniqueId.toString(),
+            target.player.world.name,
+            target.player.location.x,
+            target.player.location.y,
+            target.player.location.z,
+            target.player.location.yaw,
+            target.player.location.pitch
+        )
+
+        target.player.teleportAsync(player.location)
     }
 }
