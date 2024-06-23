@@ -10,11 +10,13 @@ import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
 import me.mapetr.uwuEssentials.commands.home.Home
+import me.mapetr.uwuEssentials.commands.home.Homes
 import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
 import me.mapetr.uwuEssentials.commands.warp.Warp
-import me.mapetr.uwuEssentials.commands.warp.WarpSet
+import me.mapetr.uwuEssentials.commands.warp.SetWarp
+import me.mapetr.uwuEssentials.commands.warp.Warps
 import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -61,9 +63,11 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(Teleport())
         manager.registerCommand(TeleportHere())
 
+        manager.registerCommand(Warps())
         manager.registerCommand(Warp())
-        manager.registerCommand(WarpSet())
+        manager.registerCommand(SetWarp())
 
+        manager.registerCommand(Homes())
         manager.registerCommand(Home())
         manager.registerCommand(SetHome())
 
