@@ -9,6 +9,8 @@ import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
+import me.mapetr.uwuEssentials.commands.home.Home
+import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
 import me.mapetr.uwuEssentials.commands.warp.Warp
@@ -46,13 +48,25 @@ class Main : JavaPlugin(), Listener {
             throw RuntimeException(e)
         }
 
+        try {
+            DB.executeUpdate("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+
         val manager = PaperCommandManager(this)
         manager.registerCommand(Spectator())
         manager.registerCommand(Kill())
+
         manager.registerCommand(Teleport())
         manager.registerCommand(TeleportHere())
+
         manager.registerCommand(Warp())
         manager.registerCommand(WarpSet())
+
+        manager.registerCommand(Home())
+        manager.registerCommand(SetHome())
+
         manager.registerCommand(Back())
         manager.enableUnstableAPI("help")
 
