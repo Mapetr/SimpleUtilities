@@ -78,6 +78,13 @@ class Main : JavaPlugin(), Listener {
                 throw RuntimeException(e)
             }
         }
+        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
+            try {
+                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
+            } catch (e: SQLException) {
+                throw RuntimeException(e)
+            }
+        }
 
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
