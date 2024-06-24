@@ -21,6 +21,16 @@ class Warp : BaseCommand() {
                 player.sendMessage("Warp $warp does not exist")
                 return
             }
+
+            DB.executeUpdate("INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                player.uniqueId.toString(),
+                player.world.name,
+                player.location.x,
+                player.location.y,
+                player.location.z,
+                player.location.yaw,
+                player.location.pitch)
+
             val loc = Location(
                 Bukkit.getWorld(row.getString("world")),
                 row.getDbl("x"),
@@ -30,7 +40,7 @@ class Warp : BaseCommand() {
                 row.getFloat("pitch")
             )
             player.sendMessage("Teleporting to warp $warp")
-            player.teleport(loc)
+            player.teleportAsync(loc)
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }

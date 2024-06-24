@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
+import co.aikar.idb.DB
 import org.bukkit.entity.Player
 
 @CommandAlias("tp")
@@ -22,6 +23,18 @@ class Teleport : BaseCommand() {
             player.sendMessage("You can't teleport to yourself")
             return
         }
-        player.teleport(target.player)
+
+        DB.executeUpdate(
+            "INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            player.uniqueId.toString(),
+            player.world.name,
+            player.location.x,
+            player.location.y,
+            player.location.z,
+            player.location.yaw,
+            player.location.pitch
+        )
+
+        player.teleportAsync(target.player.location)
     }
 }
