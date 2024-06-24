@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.annotation.Syntax
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -42,6 +43,6 @@ class Home: BaseCommand() {
             row.getFloat("pitch")
         )
         player.teleportAsync(loc)
-        player.sendMessage("Teleported to home $home")
+        Message.sendMessage(player, "<green>Teleported to home <white>$home")
     }
 }

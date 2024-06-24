@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
 @CommandAlias("tphere")
@@ -34,5 +35,7 @@ class TeleportHere : BaseCommand() {
         )
 
         target.player.teleportAsync(player.location)
+        Message.sendMessage(player, "<green>Teleported <white>${player.name}</white> to you")
+        Message.sendMessage(target.player, "<green>Teleported <white>you</white> to <white>${player.name}")
     }
 }

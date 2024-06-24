@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
 @CommandAlias("warps")
@@ -19,9 +20,9 @@ class Warps: BaseCommand() {
         }
         if (warps.isNotEmpty()) {
             warps = warps.substring(0, warps.length - 2)
-            player.sendMessage("Warps: $warps")
+            Message.sendMessage(player, "<green>Warps: <white>$warps")
         } else {
-            player.sendMessage("There are no warps")
+            Message.sendMessage(player, "<green>There are no warps")
         }
     }
 }

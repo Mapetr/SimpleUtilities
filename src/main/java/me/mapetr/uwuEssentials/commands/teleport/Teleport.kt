@@ -7,6 +7,8 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
 
 @CommandAlias("tp")
@@ -36,5 +38,6 @@ class Teleport : BaseCommand() {
         )
 
         player.teleportAsync(target.player.location)
+        Message.sendMessage(player, "<green>Teleported to <white>${target.player.name}")
     }
 }
