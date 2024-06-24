@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
 @CommandAlias("homes")
@@ -19,9 +20,9 @@ class Homes: BaseCommand() {
         }
         if (homes.isNotEmpty()) {
             homes = homes.substring(0, homes.length - 2)
-            player.sendMessage("Homes: $homes")
+            Message.sendMessage(player, "<green>Your homes: <white>$homes")
         } else {
-            player.sendMessage("You have no homes")
+            Message.sendMessage(player, "<green>You don't have any homes")
         }
     }
 }

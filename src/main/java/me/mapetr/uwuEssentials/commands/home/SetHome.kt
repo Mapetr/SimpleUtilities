@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.annotation.Syntax
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
 @CommandAlias("sethome")
@@ -32,6 +33,6 @@ class SetHome: BaseCommand() {
             loc.yaw,
             loc.pitch
         )
-        player.sendMessage("Home $home set")
+        Message.sendMessage(player, "<green>Home <white>$home <green>set")
     }
 }
