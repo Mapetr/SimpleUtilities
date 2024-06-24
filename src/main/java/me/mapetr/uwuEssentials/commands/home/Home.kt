@@ -24,6 +24,15 @@ class Home: BaseCommand() {
             return
         }
 
+        DB.executeUpdate("INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            player.uniqueId.toString(),
+            player.world.name,
+            player.location.x,
+            player.location.y,
+            player.location.z,
+            player.location.yaw,
+            player.location.pitch)
+
         val loc = Location(
             Bukkit.getWorld(row.getString("world")),
             row.getDbl("x"),
