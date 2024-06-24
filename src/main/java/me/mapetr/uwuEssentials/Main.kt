@@ -9,10 +9,14 @@ import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
+import me.mapetr.uwuEssentials.commands.home.Home
+import me.mapetr.uwuEssentials.commands.home.Homes
+import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
 import me.mapetr.uwuEssentials.commands.warp.Warp
-import me.mapetr.uwuEssentials.commands.warp.WarpSet
+import me.mapetr.uwuEssentials.commands.warp.SetWarp
+import me.mapetr.uwuEssentials.commands.warp.Warps
 import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -46,13 +50,27 @@ class Main : JavaPlugin(), Listener {
             throw RuntimeException(e)
         }
 
+        try {
+            DB.executeUpdate("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+
         val manager = PaperCommandManager(this)
         manager.registerCommand(Spectator())
         manager.registerCommand(Kill())
+
         manager.registerCommand(Teleport())
         manager.registerCommand(TeleportHere())
+
+        manager.registerCommand(Warps())
         manager.registerCommand(Warp())
-        manager.registerCommand(WarpSet())
+        manager.registerCommand(SetWarp())
+
+        manager.registerCommand(Homes())
+        manager.registerCommand(Home())
+        manager.registerCommand(SetHome())
+
         manager.registerCommand(Back())
         manager.enableUnstableAPI("help")
 
@@ -60,6 +78,13 @@ class Main : JavaPlugin(), Listener {
         completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
             try {
                 return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM warps")
+            } catch (e: SQLException) {
+                throw RuntimeException(e)
+            }
+        }
+        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
+            try {
+                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
             } catch (e: SQLException) {
                 throw RuntimeException(e)
             }

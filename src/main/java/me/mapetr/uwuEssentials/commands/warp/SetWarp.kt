@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 import java.sql.SQLException
 
 @CommandAlias("setwarp")
-class WarpSet : BaseCommand() {
+class SetWarp : BaseCommand() {
     @Default
     @Syntax("<warp>")
     @Description("Sets a warp")
