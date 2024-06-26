@@ -39,7 +39,7 @@ class Home: BaseCommand() {
         }
     }
 
-    fun goHome(player: Player, home: String = "home") {
+    private fun goHome(player: Player, home: String = "home") {
         val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
         if (row == null) throw IllegalArgumentException("Home $home not found")
 

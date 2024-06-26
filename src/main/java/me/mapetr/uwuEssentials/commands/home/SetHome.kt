@@ -34,7 +34,7 @@ class SetHome: BaseCommand() {
         }
     }
 
-    fun setHome(player: Player, home: String = "home") {
+    private fun setHome(player: Player, home: String = "home") {
         val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
         if (row != null) throw IllegalArgumentException("Home $home already exists")
 

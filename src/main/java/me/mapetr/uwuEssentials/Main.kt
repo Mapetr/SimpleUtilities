@@ -9,6 +9,7 @@ import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
+import me.mapetr.uwuEssentials.commands.home.DelHome
 import me.mapetr.uwuEssentials.commands.home.Home
 import me.mapetr.uwuEssentials.commands.home.Homes
 import me.mapetr.uwuEssentials.commands.home.SetHome
@@ -70,6 +71,7 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(Homes())
         manager.registerCommand(Home())
         manager.registerCommand(SetHome())
+        manager.registerCommand(DelHome())
 
         manager.registerCommand(Back())
         manager.enableUnstableAPI("help")
