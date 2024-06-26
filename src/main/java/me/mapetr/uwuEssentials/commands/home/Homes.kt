@@ -15,14 +15,18 @@ class Homes: BaseCommand() {
     fun onCommand(player: Player) {
         val rows = DB.getResults("SELECT * FROM homes WHERE player = ?", player.uniqueId.toString())
         var homes = ""
-        for (row in rows) {
-            homes += row.getString("name") + ", "
-        }
-        if (homes.isNotEmpty()) {
-            homes = homes.substring(0, homes.length - 2)
-            Message.sendMessage(player, "<green>Your homes: <white>$homes")
-        } else {
+        if (rows.isEmpty()) {
             Message.sendMessage(player, "<green>You don't have any homes")
+            return
         }
+
+        for (row in rows) {
+            val name = row.getString("name")
+            if (name == "home") continue
+            homes += "$name, "
+        }
+
+        homes = homes.substring(0, homes.length - 2)
+        Message.sendMessage(player, "<green>Your homes: <white>$homes")
     }
 }

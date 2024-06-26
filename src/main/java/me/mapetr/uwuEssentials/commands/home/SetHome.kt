@@ -15,11 +15,28 @@ class SetHome: BaseCommand() {
     @Syntax("<home>")
     @Description("Sets your home")
     fun onCommand(player: Player, home: String) {
-        val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
-        if (row != null) {
-            player.sendMessage("Home $home already exists")
-            return
+        try {
+            setHome(player, home)
+            Message.sendMessage(player, "<green>Home <white>$home <green>set")
+        } catch (e: IllegalArgumentException) {
+            Message.sendMessage(player, "<red>Home <white>$home <red>already exists")
         }
+    }
+
+    @Default
+    @Description("Sets your default home")
+    fun onCommand(player: Player) {
+        try {
+            setHome(player)
+            Message.sendMessage(player, "<green>Home set")
+        } catch (e: IllegalArgumentException) {
+            Message.sendMessage(player, "<red>Home already exists")
+        }
+    }
+
+    private fun setHome(player: Player, home: String = "home") {
+        val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
+        if (row != null) throw IllegalArgumentException("Home $home already exists")
 
         val loc = player.location
         DB.executeInsert(
@@ -33,6 +50,5 @@ class SetHome: BaseCommand() {
             loc.yaw,
             loc.pitch
         )
-        Message.sendMessage(player, "<green>Home <white>$home <green>set")
     }
 }

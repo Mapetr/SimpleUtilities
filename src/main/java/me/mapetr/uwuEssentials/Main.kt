@@ -9,11 +9,13 @@ import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
+import me.mapetr.uwuEssentials.commands.home.DelHome
 import me.mapetr.uwuEssentials.commands.home.Home
 import me.mapetr.uwuEssentials.commands.home.Homes
 import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
+import me.mapetr.uwuEssentials.commands.warp.DelWarp
 import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.SetWarp
 import me.mapetr.uwuEssentials.commands.warp.Warps
@@ -66,10 +68,12 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(Warps())
         manager.registerCommand(Warp())
         manager.registerCommand(SetWarp())
+        manager.registerCommand(DelWarp())
 
         manager.registerCommand(Homes())
         manager.registerCommand(Home())
         manager.registerCommand(SetHome())
+        manager.registerCommand(DelHome())
 
         manager.registerCommand(Back())
         manager.enableUnstableAPI("help")

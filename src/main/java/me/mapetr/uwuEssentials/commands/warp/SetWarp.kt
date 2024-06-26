@@ -18,7 +18,7 @@ class SetWarp : BaseCommand() {
     fun onSet(player: Player, warp: String) {
         val row = DB.getFirstRow("SELECT * FROM warps WHERE name = ?", warp)
         if (row != null) {
-            player.sendMessage("Warp $warp already exists")
+            Message.sendMessage(player, "<red>Warp <white>$warp <red>already exists")
             return
         }
         val loc = player.location

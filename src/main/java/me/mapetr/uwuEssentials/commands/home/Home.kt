@@ -19,11 +19,29 @@ class Home: BaseCommand() {
     @Syntax("<home>")
     @Description("Teleports you to your home")
     fun onCommand(player: Player, home: String) {
-        val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
-        if (row == null) {
-            player.sendMessage("Home $home not found")
+        try {
+            goHome(player, home)
+            Message.sendMessage(player, "<green>Teleported to home <white>$home")
+        } catch (e: IllegalArgumentException) {
+            Message.sendMessage(player, "<red>Home <white>$home <red>not found")
             return
         }
+    }
+
+    @Default
+    @Description("Teleports you to your default home")
+    fun onCommand(player: Player) {
+        try {
+            goHome(player)
+            Message.sendMessage(player, "<green>Teleported to default home")
+        } catch (e: IllegalArgumentException) {
+            Message.sendMessage(player, "<red>Default home not found")
+        }
+    }
+
+    private fun goHome(player: Player, home: String = "home") {
+        val row = DB.getFirstRow("SELECT * FROM homes WHERE player = ? AND name = ?", player.uniqueId.toString(), home)
+        if (row == null) throw IllegalArgumentException("Home $home not found")
 
         DB.executeUpdate("INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
             player.uniqueId.toString(),
@@ -43,6 +61,5 @@ class Home: BaseCommand() {
             row.getFloat("pitch")
         )
         player.teleportAsync(loc)
-        Message.sendMessage(player, "<green>Teleported to home <white>$home")
     }
 }
