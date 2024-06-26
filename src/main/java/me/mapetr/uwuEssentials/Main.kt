@@ -15,6 +15,7 @@ import me.mapetr.uwuEssentials.commands.home.Homes
 import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
+import me.mapetr.uwuEssentials.commands.warp.DelWarp
 import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.SetWarp
 import me.mapetr.uwuEssentials.commands.warp.Warps
@@ -67,6 +68,7 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(Warps())
         manager.registerCommand(Warp())
         manager.registerCommand(SetWarp())
+        manager.registerCommand(DelWarp())
 
         manager.registerCommand(Homes())
         manager.registerCommand(Home())

@@ -18,7 +18,7 @@ class Warp : BaseCommand() {
     fun onCommand(player: Player, warp: String) {
         val row = DB.getFirstRow("SELECT * FROM warps WHERE name = ?", warp)
         if (row == null) {
-            player.sendMessage("Warp $warp does not exist")
+            Message.sendMessage(player, "<red>Warp <white>$warp <red>not found")
             return
         }
 
