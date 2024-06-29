@@ -29,7 +29,7 @@ class Teleport : BaseCommand() {
         }
 
         Data.back[player.uniqueId.toString()] = player.location
-        Database.executeAsync("UPDATE back WHERE name = ${player.uniqueId.toString()} SET x = ${player.location.x}, y = ${player.location.y}, z = ${player.location.z}, yaw = ${player.location.yaw}, pitch = ${player.location.pitch}, world = ${player.world.name}")
+        Database.executeAsync("UPDATE back SET x = ${player.location.x}, y = ${player.location.y}, z = ${player.location.z}, yaw = ${player.location.yaw}, pitch = ${player.location.pitch}, world = '${player.world.name}' WHERE name = '${player.uniqueId.toString()}'")
 
         player.teleportAsync(target.player.location)
         Message.sendMessage(player, "<green>Teleported to <white>${target.player.name}")

@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.idb.DB
 import me.mapetr.uwuEssentials.Data
+import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -21,6 +22,9 @@ class Back : BaseCommand() {
             Message.sendMessage(player, "<red>No location to teleport back to")
             return
         }
+
+        Data.back[player.uniqueId.toString()] = player.location
+        Database.executeAsync("UPDATE back SET x = ${player.location.x}, y = ${player.location.y}, z = ${player.location.z}, yaw = ${player.location.yaw}, pitch = ${player.location.pitch}, world = '${player.world.name}' WHERE name = '${player.uniqueId.toString()}'")
 
         player.teleportAsync(loc)
         Message.sendMessage(player, "<green>Teleported to your last location")

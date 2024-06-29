@@ -27,6 +27,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.ObjectInputFilter.Config
 import java.sql.SQLException
 
 class Main : JavaPlugin(), Listener {
@@ -114,7 +115,6 @@ class Main : JavaPlugin(), Listener {
 
                 Data.warps[warpRow.getString("name")] = loc
             }
-            warpRow.close()
             statement.close()
             connection.close()
         } catch (e: SQLException) {
@@ -141,21 +141,6 @@ class Main : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
-        try {
-            val connection = Database.dataSource.connection
-            val statement = connection.createStatement()
-            for ((name, loc) in Data.back) {
-                statement.addBatch(
-                    "INSERT OR REPLACE INTO back (name, x, y, z , yaw, pitch, world) VALUES ('$name', ${loc.x}, ${loc.y}, ${loc.z}, ${loc.yaw}, ${loc.pitch}, '${loc.world.name}')"
-                )
-            }
-            statement.executeBatch()
-            statement.close()
-            connection.close()
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
-
         Database.dataSource.close()
     }
 
@@ -221,7 +206,7 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent){
         try {
-            Database.executeAsync("UPDATE back WHERE name = ${event.entity.uniqueId.toString()} SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name}")
+            Database.executeAsync("UPDATE back SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name} WHERE name = ${event.entity.uniqueId.toString()}")
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
