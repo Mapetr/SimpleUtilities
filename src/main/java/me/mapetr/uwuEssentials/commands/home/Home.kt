@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.Description
 import co.aikar.commands.annotation.Syntax
 import co.aikar.idb.DB
 import me.mapetr.uwuEssentials.Data
+import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -52,6 +53,7 @@ class Home: BaseCommand() {
         }
 
         Data.back[player.uniqueId.toString()] = player.location
+        Database.executeAsync("UPDATE back WHERE name = ${player.uniqueId.toString()} SET x = ${player.location.x}, y = ${player.location.y}, z = ${player.location.z}, yaw = ${player.location.yaw}, pitch = ${player.location.pitch}, world = ${player.world.name}")
 
         player.teleportAsync(loc)
     }

@@ -141,6 +141,21 @@ class Main : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        try {
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            for ((name, loc) in Data.back) {
+                statement.addBatch(
+                    "INSERT OR REPLACE INTO back (name, x, y, z , yaw, pitch, world) VALUES ('$name', ${loc.x}, ${loc.y}, ${loc.z}, ${loc.yaw}, ${loc.pitch}, '${loc.world.name}')"
+                )
+            }
+            statement.executeBatch()
+            statement.close()
+            connection.close()
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+
         Database.dataSource.close()
     }
 
@@ -196,8 +211,6 @@ class Main : JavaPlugin(), Listener {
     fun onPlayerQuit(event: PlayerQuitEvent) {
         Data.homes.remove(event.player.uniqueId.toString())
         Data.back.remove(event.player.uniqueId.toString())
-        logger.info(Data.homes.toString())
-        logger.info(Data.back.toString())
     }
 
     @EventHandler
@@ -208,11 +221,7 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent){
         try {
-            val connection = Database.dataSource.connection
-            val statement = connection.createStatement()
-            statement.executeUpdate("INSERT OR REPLACE INTO back (name, x, y, z , yaw, pitch, world) VALUES (${event.entity.uniqueId}, ${event.entity.location.x}, ${event.entity.location.y}, ${event.entity.location.z}, ${event.entity.location.yaw}, ${event.entity.location.pitch}, ${event.entity.location.world.name})")
-            statement.close()
-            connection.close()
+            Database.executeAsync("UPDATE back WHERE name = ${event.entity.uniqueId.toString()} SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name}")
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
