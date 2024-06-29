@@ -5,34 +5,35 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.annotation.Syntax
-import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Data
+import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
-import java.sql.SQLException
 
 @CommandAlias("setwarp")
 class SetWarp : BaseCommand() {
     @Default
     @Syntax("<warp>")
     @Description("Sets a warp")
-    fun onSet(player: Player, warp: String) {
-        val row = DB.getFirstRow("SELECT * FROM warps WHERE name = ?", warp)
-        if (row != null) {
-            Message.sendMessage(player, "<red>Warp <white>$warp <red>already exists")
+    fun onSet(player: Player, warpName: String) {
+        val warp = Data.warps[warpName]
+        if (warp != null) {
+            Message.sendMessage(player, "<red>Warp <white>$warpName <red>already exists")
             return
         }
-        val loc = player.location
-        DB.executeInsert(
+
+        Data.warps[warpName] = player.location
+        Database.executeAsync(
             "INSERT INTO warps (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            warp,
-            loc.world.name,
-            loc.x,
-            loc.y,
-            loc.z,
-            loc.yaw,
-            loc.pitch
+            warpName,
+            player.world.name,
+            player.location.x,
+            player.location.y,
+            player.location.z,
+            player.location.yaw,
+            player.location.pitch
         )
 
-        Message.sendMessage(player, "<green>Warp <white>$warp <green>set")
+        Message.sendMessage(player, "<green>Warp <white>$warpName <green>set")
     }
 }

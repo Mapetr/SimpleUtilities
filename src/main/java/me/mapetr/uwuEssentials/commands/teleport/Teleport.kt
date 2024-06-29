@@ -7,6 +7,7 @@ import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Message
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
@@ -26,16 +27,7 @@ class Teleport : BaseCommand() {
             return
         }
 
-        DB.executeUpdate(
-            "INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            player.uniqueId.toString(),
-            player.world.name,
-            player.location.x,
-            player.location.y,
-            player.location.z,
-            player.location.yaw,
-            player.location.pitch
-        )
+        Data.back[player.uniqueId.toString()] = player.location
 
         player.teleportAsync(target.player.location)
         Message.sendMessage(player, "<green>Teleported to <white>${target.player.name}")

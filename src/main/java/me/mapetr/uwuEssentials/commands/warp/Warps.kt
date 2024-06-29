@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
@@ -13,10 +14,9 @@ class Warps: BaseCommand() {
     @Default
     @Description("Lists all warps")
     fun onCommand(player: Player) {
-        val rows = DB.getResults("SELECT * FROM warps")
         var warps = ""
-        for (row in rows) {
-            warps += row.getString("name") + ", "
+        for (warp in Data.warps) {
+            warps += warp.key + ", "
         }
         if (warps.isNotEmpty()) {
             warps = warps.substring(0, warps.length - 2)
