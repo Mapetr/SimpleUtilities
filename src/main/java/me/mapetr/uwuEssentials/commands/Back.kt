@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -15,19 +16,12 @@ class Back : BaseCommand() {
     @Default
     @Description("Teleports you to your last location")
     fun onCommand(player: Player) {
-        val row = DB.getFirstRow("SELECT * FROM back WHERE name = ?", player.uniqueId.toString())
-        if (row == null) {
-            player.sendMessage("You have no last location")
+        val loc = Data.back[player.uniqueId.toString()]
+        if (loc == null) {
+            Message.sendMessage(player, "<red>No location to teleport back to")
             return
         }
-        val loc = Location(
-            Bukkit.getWorld(row.getString("world")),
-            row.getDbl("x"),
-            row.getDbl("y"),
-            row.getDbl("z"),
-            row.getFloat("yaw"),
-            row.getFloat("pitch")
-        )
+
         player.teleportAsync(loc)
         Message.sendMessage(player, "<green>Teleported to your last location")
     }
