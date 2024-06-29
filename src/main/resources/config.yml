@@ -1,6 +1,6 @@
 use_mysql: false
 mysql_host: localhost
 mysql_port: 3306
-mysql_username: uwuJobs
+mysql_username: uwuEssentials
 mysql_password: password
-mysql_database: uwuJobs
+mysql_database: uwuEssentials

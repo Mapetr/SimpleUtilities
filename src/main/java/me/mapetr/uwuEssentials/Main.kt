@@ -19,11 +19,13 @@ import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.sql.SQLException
 
@@ -84,9 +86,34 @@ class Main : JavaPlugin(), Listener {
 //            }
 //        }
 
+        try {
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            val warpRow = statement.executeQuery("SELECT * FROM warps")
+            while (warpRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(warpRow.getString("world")),
+                    warpRow.getDouble("x"),
+                    warpRow.getDouble("y"),
+                    warpRow.getDouble("z"),
+                    warpRow.getFloat("yaw"),
+                    warpRow.getFloat("pitch")
+                )
+
+                Data.warps[warpRow.getString("name")] = loc
+            }
+            warpRow.close()
+            statement.close()
+            connection.close()
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+        logger.info(Data.warps.toString())
+
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
         val msg = MiniMessage.miniMessage()
+        // TODO: Move this to the default config.yml file
         config.addDefault("footer", "I love foot <tps>")
         config.addDefault("header", "I love head <tps>")
         config.addDefault("delay", 100)
@@ -108,6 +135,57 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         _playerListManager.reloadPlayerList(MiniMessage.miniMessage(), event.player)
+
+        try {
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            val homeRow =
+                statement.executeQuery("SELECT * FROM homes WHERE player = '${event.player.uniqueId}'")
+            Data.homes[event.player.uniqueId.toString()] = HashMap()
+            while (homeRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(homeRow.getString("world")),
+                    homeRow.getDouble("x"),
+                    homeRow.getDouble("y"),
+                    homeRow.getDouble("z"),
+                    homeRow.getFloat("yaw"),
+                    homeRow.getFloat("pitch")
+                )
+
+                Data.homes[event.player.uniqueId.toString()]?.set(homeRow.getString("name"), loc)
+            }
+
+            val backRow =
+                statement.executeQuery("SELECT * FROM back WHERE name = '${event.player.uniqueId}'")
+            while (backRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(backRow.getString("world")),
+                    backRow.getDouble("x"),
+                    backRow.getDouble("y"),
+                    backRow.getDouble("z"),
+                    backRow.getFloat("yaw"),
+                    backRow.getFloat("pitch")
+                )
+
+                Data.back[event.player.uniqueId.toString()] = loc
+            }
+
+            statement.close()
+            connection.close()
+
+            logger.info(Data.homes.toString())
+            logger.info(Data.back.toString())
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        Data.homes.remove(event.player.uniqueId.toString())
+        Data.back.remove(event.player.uniqueId.toString())
+        logger.info(Data.homes.toString())
+        logger.info(Data.back.toString())
     }
 
     @EventHandler
