@@ -78,20 +78,25 @@ class Main : JavaPlugin(), Listener {
         manager.enableUnstableAPI("help")
 
         val completions = manager.commandCompletions
-//        completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
-//            try {
-//                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM warps")
-//            } catch (e: SQLException) {
-//                throw RuntimeException(e)
-//            }
-//        }
-//        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
-//            try {
-//                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
-//            } catch (e: SQLException) {
-//                throw RuntimeException(e)
-//            }
-//        }
+        completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
+            try {
+                return@registerAsyncCompletion Data.warps.keys.toList()
+            } catch (e: SQLException) {
+                throw RuntimeException(e)
+            }
+        }
+        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
+            try {
+                val player = c?.player?.uniqueId.toString()
+                val homes = Data.homes[player]?.keys?.toMutableList() ?: mutableListOf()
+
+                homes.remove("home")
+
+                return@registerAsyncCompletion homes
+            } catch (e: SQLException) {
+                throw RuntimeException(e)
+            }
+        }
 
         try {
             val connection = Database.dataSource.connection
