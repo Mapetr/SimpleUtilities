@@ -4,6 +4,8 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import co.aikar.idb.DB
+import me.mapetr.uwuEssentials.Data
+import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
 import org.bukkit.entity.Player
 
@@ -23,16 +25,8 @@ class TeleportHere : BaseCommand() {
             return
         }
 
-        DB.executeUpdate(
-            "INSERT OR REPLACE INTO back (name, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            target.player.uniqueId.toString(),
-            target.player.world.name,
-            target.player.location.x,
-            target.player.location.y,
-            target.player.location.z,
-            target.player.location.yaw,
-            target.player.location.pitch
-        )
+        Data.back[target.player.uniqueId.toString()] = target.player.location
+        Database.executeAsync("UPDATE back SET x = ${target.player.location.x}, y = ${target.player.location.y}, z = ${target.player.location.z}, yaw = ${target.player.location.yaw}, pitch = ${target.player.location.pitch}, world = '${target.player.world.name}' WHERE name = '${target.player.uniqueId.toString()}'")
 
         target.player.teleportAsync(player.location)
         Message.sendMessage(player, "<green>Teleported <white>${player.name}</white> to you")

@@ -2,10 +2,6 @@ package me.mapetr.uwuEssentials
 
 import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.PaperCommandManager
-import co.aikar.idb.DB
-import co.aikar.idb.Database
-import co.aikar.idb.DatabaseOptions
-import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
@@ -23,37 +19,41 @@ import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.ObjectInputFilter.Config
 import java.sql.SQLException
 
 class Main : JavaPlugin(), Listener {
     var _playerListManager: PlayerListManager = PlayerListManager(config)
     var _chatService: ChatService = ChatService(config)
+
+    companion object {
+        lateinit var instance: Main
+    }
+
     override fun onEnable() {
+        instance = this
+
         saveDefaultConfig()
 
-        val options = DatabaseOptions.builder().sqlite("${this.dataFolder}/uwu.db").build()
-        val db: Database = PooledDatabaseOptions.builder().options(options).createHikariDatabase()
-        DB.setGlobalDatabase(db)
+        Database.connect()
 
         try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS warps (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
-        try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS back (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
-
-        try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            statement.addBatch("CREATE TABLE IF NOT EXISTS warps (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
+            statement.addBatch("CREATE TABLE IF NOT EXISTS back (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
+            statement.addBatch("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+            statement.executeBatch()
+            statement.close()
+            connection.close()
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
@@ -81,22 +81,51 @@ class Main : JavaPlugin(), Listener {
         val completions = manager.commandCompletions
         completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
             try {
-                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM warps")
+                return@registerAsyncCompletion Data.warps.keys.toList()
             } catch (e: SQLException) {
                 throw RuntimeException(e)
             }
         }
         completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
             try {
-                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
+                val player = c?.player?.uniqueId.toString()
+                val homes = Data.homes[player]?.keys?.toMutableList() ?: mutableListOf()
+
+                homes.remove("home")
+
+                return@registerAsyncCompletion homes
             } catch (e: SQLException) {
                 throw RuntimeException(e)
             }
         }
 
+        try {
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            val warpRow = statement.executeQuery("SELECT * FROM warps")
+            while (warpRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(warpRow.getString("world")),
+                    warpRow.getDouble("x"),
+                    warpRow.getDouble("y"),
+                    warpRow.getDouble("z"),
+                    warpRow.getFloat("yaw"),
+                    warpRow.getFloat("pitch")
+                )
+
+                Data.warps[warpRow.getString("name")] = loc
+            }
+            statement.close()
+            connection.close()
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+        logger.info(Data.warps.toString())
+
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
         val msg = MiniMessage.miniMessage()
+        // TODO: Move this to the default config.yml file
         config.addDefault("footer", "I love foot <tps>")
         config.addDefault("header", "I love head <tps>")
         config.addDefault("delay", 100)
@@ -106,18 +135,67 @@ class Main : JavaPlugin(), Listener {
         config.addDefault("chat.colors.msg", "#FFFFFF")
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
             _playerListManager.reloadGlobalPlayerList(msg)
-        }, config.getLong("delay"), config.getLong("frequency"))
+        }, config.getLong("tab_refresh"), config.getLong("tab_refresh"))
         config.options().copyDefaults(true)
         saveConfig()
     }
 
     override fun onDisable() {
-        DB.close()
+        Database.dataSource.close()
     }
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         _playerListManager.reloadPlayerList(MiniMessage.miniMessage(), event.player)
+
+        try {
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            val homeRow =
+                statement.executeQuery("SELECT * FROM homes WHERE player = '${event.player.uniqueId}'")
+            Data.homes[event.player.uniqueId.toString()] = HashMap()
+            while (homeRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(homeRow.getString("world")),
+                    homeRow.getDouble("x"),
+                    homeRow.getDouble("y"),
+                    homeRow.getDouble("z"),
+                    homeRow.getFloat("yaw"),
+                    homeRow.getFloat("pitch")
+                )
+
+                Data.homes[event.player.uniqueId.toString()]?.set(homeRow.getString("name"), loc)
+            }
+
+            val backRow =
+                statement.executeQuery("SELECT * FROM back WHERE name = '${event.player.uniqueId}'")
+            while (backRow.next()) {
+                val loc = Location(
+                    Bukkit.getWorld(backRow.getString("world")),
+                    backRow.getDouble("x"),
+                    backRow.getDouble("y"),
+                    backRow.getDouble("z"),
+                    backRow.getFloat("yaw"),
+                    backRow.getFloat("pitch")
+                )
+
+                Data.back[event.player.uniqueId.toString()] = loc
+            }
+
+            statement.close()
+            connection.close()
+
+            logger.info(Data.homes.toString())
+            logger.info(Data.back.toString())
+        } catch (e: SQLException) {
+            throw RuntimeException(e)
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        Data.homes.remove(event.player.uniqueId.toString())
+        Data.back.remove(event.player.uniqueId.toString())
     }
 
     @EventHandler
@@ -128,7 +206,7 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent){
         try {
-            DB.executeUpdate("INSERT OR REPLACE INTO back (name, x, y, z, yaw, pitch, world) VALUES (?, ?, ?, ?, ?, ?, ?)", event.player.uniqueId.toString(), event.entity.location.x, event.entity.location.y, event.entity.location.z, event.entity.location.yaw, event.entity.location.pitch, event.entity.location.world.name)
+            Database.executeAsync("UPDATE back SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name} WHERE name = ${event.entity.uniqueId.toString()}")
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }

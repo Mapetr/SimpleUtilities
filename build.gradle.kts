@@ -23,7 +23,7 @@ dependencies {
 }
 
 group = "me.mapetr"
-version = "1.0-SNAPSHOT"
+version = "1.2-SNAPSHOT"
 description = "uwuEssentials"
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
