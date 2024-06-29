@@ -2,10 +2,6 @@ package me.mapetr.uwuEssentials
 
 import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.PaperCommandManager
-import co.aikar.idb.DB
-import co.aikar.idb.Database
-import co.aikar.idb.DatabaseOptions
-import co.aikar.idb.PooledDatabaseOptions
 import me.mapetr.uwuEssentials.commands.Back
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
@@ -37,23 +33,17 @@ class Main : JavaPlugin(), Listener {
     override fun onEnable() {
         saveDefaultConfig()
 
-        val options = DatabaseOptions.builder().sqlite("${this.dataFolder}/uwu.db").build()
-        val db: Database = PooledDatabaseOptions.builder().options(options).createHikariDatabase()
-        DB.setGlobalDatabase(db)
+        Database.connect()
 
         try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS warps (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
-        try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS back (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
-
-        try {
-            DB.executeUpdate("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            statement.addBatch("CREATE TABLE IF NOT EXISTS warps (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
+            statement.addBatch("CREATE TABLE IF NOT EXISTS back (name VARCHAR(255) PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255))")
+            statement.addBatch("CREATE TABLE IF NOT EXISTS homes (player VARCHAR(255), name VARCHAR(255), x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, world VARCHAR(255), PRIMARY KEY (player, name))")
+            statement.executeBatch()
+            statement.close()
+            connection.close()
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
@@ -79,20 +69,20 @@ class Main : JavaPlugin(), Listener {
         manager.enableUnstableAPI("help")
 
         val completions = manager.commandCompletions
-        completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
-            try {
-                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM warps")
-            } catch (e: SQLException) {
-                throw RuntimeException(e)
-            }
-        }
-        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
-            try {
-                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
-            } catch (e: SQLException) {
-                throw RuntimeException(e)
-            }
-        }
+//        completions.registerAsyncCompletion("warps") { c: BukkitCommandCompletionContext? ->
+//            try {
+//                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM warps")
+//            } catch (e: SQLException) {
+//                throw RuntimeException(e)
+//            }
+//        }
+//        completions.registerAsyncCompletion("homes") { c: BukkitCommandCompletionContext? ->
+//            try {
+//                return@registerAsyncCompletion DB.getFirstColumnResults<String>("SELECT name FROM homes WHERE player = ?", c?.player?.uniqueId.toString())
+//            } catch (e: SQLException) {
+//                throw RuntimeException(e)
+//            }
+//        }
 
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
@@ -106,13 +96,13 @@ class Main : JavaPlugin(), Listener {
         config.addDefault("chat.colors.msg", "#FFFFFF")
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
             _playerListManager.reloadGlobalPlayerList(msg)
-        }, config.getLong("delay"), config.getLong("frequency"))
+        }, config.getLong("tab_refresh"), config.getLong("tab_refresh"))
         config.options().copyDefaults(true)
         saveConfig()
     }
 
     override fun onDisable() {
-        DB.close()
+        Database.dataSource.close()
     }
 
     @EventHandler
@@ -128,7 +118,11 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent){
         try {
-            DB.executeUpdate("INSERT OR REPLACE INTO back (name, x, y, z, yaw, pitch, world) VALUES (?, ?, ?, ?, ?, ?, ?)", event.player.uniqueId.toString(), event.entity.location.x, event.entity.location.y, event.entity.location.z, event.entity.location.yaw, event.entity.location.pitch, event.entity.location.world.name)
+            val connection = Database.dataSource.connection
+            val statement = connection.createStatement()
+            statement.executeUpdate("INSERT OR REPLACE INTO back (name, x, y, z , yaw, pitch, world) VALUES (${event.entity.uniqueId}, ${event.entity.location.x}, ${event.entity.location.y}, ${event.entity.location.z}, ${event.entity.location.yaw}, ${event.entity.location.pitch}, ${event.entity.location.world.name})")
+            statement.close()
+            connection.close()
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
