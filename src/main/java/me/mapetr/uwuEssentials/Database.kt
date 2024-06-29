@@ -22,7 +22,7 @@ class Database {
         }
 
         fun executeAsync(query: String, vararg params: Any) {
-            Main().server.asyncScheduler.runNow(Main()) {
+            Main().server.asyncScheduler.runNow(Main.instance) {
                 val connection = dataSource.connection
                 val statement = connection.prepareStatement(query)
                 for (i in params.indices) {

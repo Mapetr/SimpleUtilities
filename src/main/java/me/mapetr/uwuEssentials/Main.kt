@@ -32,7 +32,14 @@ import java.sql.SQLException
 class Main : JavaPlugin(), Listener {
     var _playerListManager: PlayerListManager = PlayerListManager(config)
     var _chatService: ChatService = ChatService(config)
+
+    companion object {
+        lateinit var instance: Main
+    }
+
     override fun onEnable() {
+        instance = this
+
         saveDefaultConfig()
 
         Database.connect()
