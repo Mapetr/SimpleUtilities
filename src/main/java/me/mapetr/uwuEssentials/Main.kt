@@ -122,7 +122,6 @@ class Main : JavaPlugin(), Listener {
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
-        logger.info(Data.warps.toString())
 
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
@@ -187,8 +186,6 @@ class Main : JavaPlugin(), Listener {
             statement.close()
             connection.close()
 
-            logger.info(Data.homes.toString())
-            logger.info(Data.back.toString())
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
