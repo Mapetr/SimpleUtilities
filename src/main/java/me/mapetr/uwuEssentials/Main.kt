@@ -3,6 +3,7 @@ package me.mapetr.uwuEssentials
 import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.PaperCommandManager
 import me.mapetr.uwuEssentials.commands.Back
+import me.mapetr.uwuEssentials.commands.Chunks
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
 import me.mapetr.uwuEssentials.commands.home.DelHome
@@ -75,6 +76,8 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(DelHome())
 
         manager.registerCommand(Back())
+
+        manager.registerCommand(Chunks())
         manager.enableUnstableAPI("help")
 
         val completions = manager.commandCompletions
