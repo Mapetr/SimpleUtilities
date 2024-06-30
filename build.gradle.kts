@@ -15,7 +15,6 @@ repositories {
 dependencies {
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("co.aikar:idb-core:1.0.0-SNAPSHOT")
     api(libs.org.jetbrains.kotlin.kotlin.stdlib.jdk8)
     testImplementation(libs.org.jetbrains.kotlin.kotlin.test)
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")

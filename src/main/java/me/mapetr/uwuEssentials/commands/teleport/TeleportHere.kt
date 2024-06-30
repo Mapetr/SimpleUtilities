@@ -3,7 +3,6 @@ package me.mapetr.uwuEssentials.commands.teleport
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
-import co.aikar.idb.DB
 import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message

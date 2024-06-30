@@ -4,12 +4,9 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
-import co.aikar.idb.DB
 import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
-import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.entity.Player
 
 @CommandAlias("back")

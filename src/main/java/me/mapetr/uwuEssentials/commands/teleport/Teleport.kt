@@ -6,11 +6,9 @@ import co.aikar.commands.annotation.CommandCompletion
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Description
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
-import co.aikar.idb.DB
 import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
 
 @CommandAlias("tp")

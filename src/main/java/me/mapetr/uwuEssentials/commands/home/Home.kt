@@ -1,17 +1,10 @@
 package me.mapetr.uwuEssentials.commands.home
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.CommandCompletion
-import co.aikar.commands.annotation.Default
-import co.aikar.commands.annotation.Description
-import co.aikar.commands.annotation.Syntax
-import co.aikar.idb.DB
+import co.aikar.commands.annotation.*
 import me.mapetr.uwuEssentials.Data
 import me.mapetr.uwuEssentials.Database
 import me.mapetr.uwuEssentials.Message
-import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.entity.Player
 
 @CommandAlias("home")

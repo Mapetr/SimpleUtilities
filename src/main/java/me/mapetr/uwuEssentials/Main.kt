@@ -12,8 +12,8 @@ import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
 import me.mapetr.uwuEssentials.commands.warp.DelWarp
-import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.SetWarp
+import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.Warps
 import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
@@ -27,7 +27,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.ObjectInputFilter.Config
 import java.sql.SQLException
 
 class Main : JavaPlugin(), Listener {
