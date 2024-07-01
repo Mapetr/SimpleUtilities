@@ -1,6 +1,5 @@
 package me.mapetr.uwuEssentials
 
-import me.mapetr.uwuEssentials.commands.warp.Warp
 import org.bukkit.Location
 
 class Data {

@@ -3,6 +3,7 @@ package me.mapetr.uwuEssentials
 import co.aikar.commands.BukkitCommandCompletionContext
 import co.aikar.commands.PaperCommandManager
 import me.mapetr.uwuEssentials.commands.Back
+import me.mapetr.uwuEssentials.commands.Chunks
 import me.mapetr.uwuEssentials.commands.Kill
 import me.mapetr.uwuEssentials.commands.Spectator
 import me.mapetr.uwuEssentials.commands.home.DelHome
@@ -12,8 +13,8 @@ import me.mapetr.uwuEssentials.commands.home.SetHome
 import me.mapetr.uwuEssentials.commands.teleport.Teleport
 import me.mapetr.uwuEssentials.commands.teleport.TeleportHere
 import me.mapetr.uwuEssentials.commands.warp.DelWarp
-import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.SetWarp
+import me.mapetr.uwuEssentials.commands.warp.Warp
 import me.mapetr.uwuEssentials.commands.warp.Warps
 import me.mapetr.uwuEssentials.services.ChatService
 import me.mapetr.uwuEssentials.services.PlayerListManager
@@ -27,7 +28,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.io.ObjectInputFilter.Config
 import java.sql.SQLException
 
 class Main : JavaPlugin(), Listener {
@@ -76,6 +76,8 @@ class Main : JavaPlugin(), Listener {
         manager.registerCommand(DelHome())
 
         manager.registerCommand(Back())
+
+        manager.registerCommand(Chunks())
         manager.enableUnstableAPI("help")
 
         val completions = manager.commandCompletions
@@ -120,7 +122,6 @@ class Main : JavaPlugin(), Listener {
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
-        logger.info(Data.warps.toString())
 
         this.saveDefaultConfig()
         server.pluginManager.registerEvents(Main(), this)
@@ -185,8 +186,6 @@ class Main : JavaPlugin(), Listener {
             statement.close()
             connection.close()
 
-            logger.info(Data.homes.toString())
-            logger.info(Data.back.toString())
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
