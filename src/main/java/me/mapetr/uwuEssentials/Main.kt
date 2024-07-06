@@ -205,7 +205,7 @@ class Main : JavaPlugin(), Listener {
     @EventHandler
     fun onPlayerDeath(event: PlayerDeathEvent){
         try {
-            Database.executeAsync("UPDATE back SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name} WHERE name = ${event.entity.uniqueId.toString()}")
+            Database.executeAsync("UPDATE back SET x = ${event.entity.location.x}, y = ${event.entity.location.y}, z = ${event.entity.location.z}, yaw = ${event.entity.location.yaw}, pitch = ${event.entity.location.pitch}, world = ${event.entity.world.name} WHERE name = '${event.entity.uniqueId.toString()}'")
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
