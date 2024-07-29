@@ -27,6 +27,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.sql.SQLException
 
@@ -209,5 +210,10 @@ class Main : JavaPlugin(), Listener {
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
+    }
+
+    @EventHandler
+    fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
+        logger.info(event.player.name)
     }
 }
